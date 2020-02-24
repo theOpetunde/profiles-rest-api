@@ -2,9 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import BaseUserManager
+from django.conf import settings
 
 
-"""Custom user manager is created so Django knows how 
+"""Custom user manager is created so Django knows how
 to work and interact with the custom user model created in the Django CLI tools"""
 class UserProfileManager(BaseUserManager):
     """Manager for user profiles"""
@@ -21,7 +22,7 @@ class UserProfileManager(BaseUserManager):
         user.save(using=self._db)
 
         return user
-    
+
     def create_superuser(self, email, name, password):
         """Create and save a new superuser with given details"""
         user = self.create_user(email, name, password)
@@ -72,7 +73,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         """Retrieve full name of user"""
         return self.name
-    
+
     def get_short_name(self):
         """Retrieve short name of user"""
         return self.name
@@ -80,3 +81,17 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """Return string representation of our user"""
         return self.email
+
+
+class ProfileFeedItem(models.Model):
+    """Profile status update"""
+    user_profile = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete = models.CASCADE
+    )
+    status_text = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """return the model as a string"""
+        return self.status_text
